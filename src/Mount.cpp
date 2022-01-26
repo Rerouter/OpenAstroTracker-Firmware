@@ -381,8 +381,13 @@ void Mount::configureRAdriver(Stream *serial, float rsense, byte driveraddress, 
 
     #elif SW_SERIAL_UART == 1
 
+ISR(TIMER5_OVF_vect) { IntervalInterrupt_AVR<Timer::TIMER_5>::handle_overflow(); }
+ISR(TIMER5_COMPA_vect) { IntervalInterrupt_AVR<Timer::TIMER_5>::handle_compare_match(); }
+
 void Mount::configureRAdriver(uint16_t RA_SW_RX, uint16_t RA_SW_TX, float rsense, byte driveraddress, int rmscurrent, int stallvalue)
 {
+    axis::ra::stepper::move(Angle::deg(0), Angle::deg(0));
+
     _driverRA = new TMC2209Stepper(RA_SW_RX, RA_SW_TX, rsense, driveraddress);
     _driverRA->beginSerial(19200);
     _driverRA->mstep_reg_select(true);

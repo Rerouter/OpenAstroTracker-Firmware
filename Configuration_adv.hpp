@@ -30,7 +30,7 @@
 //
 // This is how many steps your stepper needs for a full rotation.
 #ifndef RA_STEPPER_SPR
-    #define RA_STEPPER_SPR 400  // NEMA 0.9° = 400  |  NEMA 1.8° = 200
+    #define RA_STEPPER_SPR 400UL  // NEMA 0.9° = 400  |  NEMA 1.8° = 200
 #endif
 #ifndef RA_STEPPER_SPEED
     #define RA_STEPPER_SPEED 1200  // You can change the speed and acceleration of the steppers here. Max. Speed = 3000.

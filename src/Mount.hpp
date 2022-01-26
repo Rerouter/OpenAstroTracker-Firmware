@@ -5,6 +5,31 @@
 #include "Latitude.hpp"
 #include "Longitude.hpp"
 
+#define USE_STEPPER_TIMER_1
+#include "IntervalInterrupt.h"
+#include "Driver.h"
+#include "Angle.h"
+#include "Stepper.h"
+#include "Pin.h"
+
+namespace axis
+{
+  namespace ra
+  {
+    constexpr float TRANSMISSION = RA_WHEEL_CIRCUMFERENCE / (RA_PULLEY_TEETH * GT2_BELT_PITCH);
+
+    constexpr uint32_t SPR = RA_STEPPER_SPR * RA_TRACKING_MICROSTEPPING;
+
+    constexpr Angle SLEWING_SPEED = Angle::deg(2.0f) * TRANSMISSION;
+
+    using pinStep = Pin<46>;
+    using pinDir = Pin<47>;
+    using interrupt = IntervalInterrupt<Timer::TIMER_5>;
+    using driver = Driver<SPR, pinStep, pinDir>;
+    using stepper = Stepper<interrupt, driver, SLEWING_SPEED.mrad_u32(), 2 * SLEWING_SPEED.mrad_u32()>;
+  }
+}
+
 // Forward declarations
 class AccelStepper;
 class LcdMenu;
