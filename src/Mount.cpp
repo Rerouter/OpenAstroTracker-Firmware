@@ -1190,6 +1190,20 @@ const DayTime Mount::currentRA() const
             hourPos -= 24;
     }
 
+	if (NORTHERN_HEMISPHERE ? degreePos < 0 : degreePos > 0)
+	if (NORTHERN_HEMISPHERE)
+    {
+        hourPos -= 12;
+        if (hourPos < 0)
+            hourPos += 24;
+    }
+	else
+    {
+		hourPos += 12;
+        if (hourPos > 24)
+            hourPos -= 24;
+	}
+
     // Make sure we are normalized
     if (hourPos < 0)
         hourPos += 24;
@@ -3164,10 +3178,6 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
 
     // Where do we want to move RA to?
     float moveRA = raTarget.getTotalHours();
-    if (!NORTHERN_HEMISPHERE)
-    {
-        moveRA += 12;
-    }
 
     // Total hours of tracking-to-date
     float trackedHours = (_stepperTRK->currentPosition() / _trackingSpeed) / 3600.0F;  // steps / steps/s / 3600 = hours
@@ -3202,6 +3212,10 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
 
     // Where do we want to move DEC to?
     float moveDEC = decTarget.getTotalDegrees();
+	if(!NORTHERN_HEMISPHERE)
+	{
+		moveDEC += 180;
+	}
 
     LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Target hrs pos RA: %f (regRA: %f), DEC: %f", homeTargetDeltaRA, moveRA, moveDEC);
 
@@ -3777,11 +3791,18 @@ void Mount::checkRALimit()
     const float degreePos    = (_stepperDEC->currentPosition() / _stepsPerDECDegree) + _zeroPosDEC;
     float hourPos            = currentRA().getTotalHours();
     if (NORTHERN_HEMISPHERE ? degreePos < 0 : degreePos > 0)
+	if (NORTHERN_HEMISPHERE)
     {
         hourPos -= 12;
         if (hourPos < 0)
             hourPos += 24;
     }
+	else
+    {
+		hourPos += 12;
+        if (hourPos > 24)
+            hourPos -= 24;
+	}
     LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: homeRA: %f", homeRA);
     LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: currentRA: %f", currentRA().getTotalHours());
     LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: currentRA (adjusted): %f", hourPos);
